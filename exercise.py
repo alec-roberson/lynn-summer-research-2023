@@ -25,13 +25,39 @@ def get_correlations(state, theta, phi):
     # obtain the coefficients in the new basis
     return np.abs(np.vdot(e1e1, state))**2 + np.abs(np.vdot(e2e2, state))**2
 
-thetas = np.linspace(0, np.pi/2, 100)
+def get_correlation_grid(state, thetas, phis):
+    correlations = np.zeros((len(phis), len(thetas)))
+    for i, theta in enumerate(thetas):
+        for j, phi in enumerate(phis):
+            correlations[j,i] = get_correlations(state, theta, phi)
+    return correlations
 
-plt.plot(thetas, [get_correlations(phi_plus, theta, 0) for theta in thetas], label='$\\Phi^+$')
-plt.plot(thetas, [get_correlations(phi_minus, theta, 0) for theta in thetas], label='$\\Phi^-$')
-plt.plot(thetas, [get_correlations(psi_plus, theta, 0) for theta in thetas], label='$\\Psi^+$')
-plt.plot(thetas, [get_correlations(psi_minus, theta, 0) for theta in thetas], label='$\\Psi^-$')
-plt.xlabel('$\\theta$')
-plt.ylabel('correlation probability')
-plt.legend()
+thetas = np.linspace(0, np.pi/2, 50)
+phis = np.linspace(0, np.pi, 100)
+theta_grid, phi_grid = np.meshgrid(thetas, phis)
+
+fig = plt.figure()
+
+kwargs = {'edgecolor':'royalblue', 'lw':0.2, 'rstride':8, 'cstride':8, 'alpha':0.3}
+ax = fig.add_subplot(221, projection='3d')
+ax.set_xlabel('$\\theta$')
+ax.set_ylabel('$\\phi$')
+ax.plot_surface(theta_grid, phi_grid, get_correlation_grid(phi_plus, thetas, phis), **kwargs, label='$\\Phi^+$')
+
+ax = fig.add_subplot(222, projection='3d')
+ax.set_xlabel('$\\theta$')
+ax.set_ylabel('$\\phi$')
+ax.plot_surface(theta_grid, phi_grid, get_correlation_grid(phi_minus, thetas, phis), **kwargs, label='$\\Phi^-$')
+
+ax = fig.add_subplot(223, projection='3d')
+ax.set_xlabel('$\\theta$')
+ax.set_ylabel('$\\phi$')
+ax.plot_surface(theta_grid, phi_grid, get_correlation_grid(psi_plus, thetas, phis), **kwargs, label='$\\Psi^+$')
+
+ax = fig.add_subplot(224, projection='3d')
+ax.set_xlabel('$\\theta$')
+ax.set_ylabel('$\\phi$')
+ax.plot_surface(theta_grid, phi_grid, get_correlation_grid(psi_minus, thetas, phis), **kwargs, label='$\\Psi^-$')
+
+# ax.legend()
 plt.show()
